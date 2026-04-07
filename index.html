@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>עיצוב שירים - Poetry Designer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700&family=Amiri:wght@400;700&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #fef5e7 0%, #fde4e4 50%, #f0e6ff 100%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #d4a5a5 0%, #c8a2e0 100%);
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .controls-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding-right: 15px;
+        }
+
+        .controls-panel::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .controls-panel::-webkit-scrollbar-thumb {
+            background: #d4a5a5;
+            border-radius: 3px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            border-bottom: 2px solid #e0d5e8;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            padding: 10px 15px;
+            border: none;
+            background: transparent;
+            color: #999;
+            cursor: pointer;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            font-size: 13px;
+        }
+
+        .tab-button.active {
+            color: #c8a2e0;
+            border-bottom-color: #c8a2e0;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        label {
+            font-weight: 600;
+            color: #5a4a6b;
+            font-size: 14px;
+        }
+
+        input[type="color"],
+        input[type="text"],
+        input[type="file"],
+        select,
+        textarea {
+            padding: 12px 15px;
+            border: 2px solid #e0d5e8;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"],
+        select,
+        textarea,
+        input[type="file"] {
+            color: #333;
+        }
+
+        input[type="text"]:focus,
+        select:focus,
+        textarea:focus,
+        input[type="color"]:focus,
+        input[type="file"]:focus {
+            outline: none;
+            border-color: #c8a2e0;
+            box-shadow: 0 0 0 3px rgba(200, 162, 224, 0.1);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #e0d5e8;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #c8a2e0;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(200, 162, 224, 0.4);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #c8a2e0;
+            cursor: pointer;
+            border: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: 2px solid #c8a2e0;
+            border-radius: 10px;
+            background: white;
+            color: #c8a2e0;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            flex: 1;
+            min-width: 100px;
+        }
+
+        button:hover {
+            background: #c8a2e0;
+            color: white;
+        }
+
+        button.reset {
+            border-color: #d4a5a5;
+            color: #d4a5a5;
+        }
+
+        button.reset:hover {
+            background: #d4a5a5;
+            color: white;
+        }
+
+        .color-presets {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+
+        .color-preset {
+            width: 100%;
+            height: 40px;
+            border-radius: 8px;
+            border: 2px solid #e0d5e8;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .color-preset:hover {
+            border-color: #c8a2e0;
+            transform: scale(1.05);
+        }
+
+        .font-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .font-option {
+            padding: 10px;
+            border: 2px solid #e0d5e8;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 16px;
+        }
+
+        .font-option:hover {
+            border-color: #c8a2e0;
+            background: #f9f5ff;
+        }
+
+        .font-option.active {
+            border-color: #c8a2e0;
+            background: #e8dff5;
+            font-weight: 700;
+        }
+
+        .element-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .element-button {
+            padding: 15px;
+            border: 2px solid #e0d5e8;
+            border-radius: 10px;
+            background: white;
+            color: #5a4a6b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .element-button:hover {
+            border-color: #c8a2e0;
+            background: #f9f5ff;
+        }
+
+        .element-button.active {
+            border-color: #c8a2e0;
+            background: #e8dff5;
+            font-weight: 700;
+        }
+
+        .preview-panel {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .poem-canvas {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 9/12;
+            border-radius: 15px;
+            overflow: hidden;
+            background: white;
+            border: 2px solid #e0d5e8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .poem-text {
+            width: 85%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            padding: 30px;
+            line-height: 1.8;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        .canvas-element {
+            position: absolute;
+            font-size: 48px;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .uploaded-bg-preview {
+            width: 100%;
+            height: 100px;
+            border-radius: 8px;
+            background-size: cover;
+            background-position: center;
+            margin-top: 10px;
+            border: 2px solid #e0d5e8;
+        }
+
+        .range-display {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .range-display span {
+            min-width: 50px;
+            text-align: center;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .poem-canvas {
+                aspect-ratio: auto;
+                min-height: 400px;
+            }
+        }
+
+        .export-hint {
+            font-size: 12px;
+            color: #999;
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌸 עיצוב שירים 🌸</h1>
+            <p>צור עיצוב אישי וייחודי לשיר שלך</p>
+        </div>
+
+        <div class="main-content">
+            <div class="controls-panel">
+                <!-- טאבים -->
+                <div class="tabs">
+                    <button class="tab-button active" onclick="switchTab('text')">📝 טקסט</button>
+                    <button class="tab-button" onclick="switchTab('design')">🎨 עיצוב</button>
+                    <button class="tab-button" onclick="switchTab('background')">🖼️ רקע</button>
+                    <button class="tab-button" onclick="switchTab('elements')">✨ אלמנטים</button>
+                </div>
+
+                <!-- TAB: טקסט -->
+                <div id="text" class="tab-content active">
+                    <div class="control-group">
+                        <label for="poemText">כתוב את השיר שלך</label>
+                        <textarea id="poemText" rows="10" placeholder="כתוב את השיר שלך כאן..."></textarea>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="fontFamily">בחר פונט</label>
+                        <div class="font-options">
+                            <div class="font-option active" onclick="setFont('inherit', this)" style="font-family: inherit;">סטנדרט</div>
+                            <div class="font-option" onclick="setFont('Almarai, sans-serif', this)" style="font-family: 'Almarai', sans-serif;">Almarai</div>
+                            <div class="font-option" onclick="setFont('Amiri, serif', this)" style="font-family: 'Amiri', serif;">Amiri</div>
+                            <div class="font-option" onclick="setFont('Cairo, sans-serif', this)" style="font-family: 'Cairo', sans-serif;">Cairo</div>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="fontSize">גודל הטקסט</label>
+                        <div class="range-display">
+                            <input type="range" id="fontSize" min="12" max="56" value="24">
+                            <span id="fontSizeValue">24px</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: עיצוב -->
+                <div id="design" class="tab-content">
+                    <div class="control-group">
+                        <label for="textColor">צבע הטקסט</label>
+                        <input type="color" id="textColor" value="#5a4a6b">
+                        <div class="color-presets">
+                            <div class="color-preset" style="background: #5a4a6b;" onclick="setColor('#5a4a6b')"></div>
+                            <div class="color-preset" style="background: #ffffff;" onclick="setColor('#ffffff')" title="לבן"></div>
+                            <div class="color-preset" style="background: #c8a2e0;" onclick="setColor('#c8a2e0')"></div>
+                            <div class="color-preset" style="background: #d4a5a5;" onclick="setColor('#d4a5a5')"></div>
+                            <div class="color-preset" style="background: #2d1b3d;" onclick="setColor('#2d1b3d')"></div>
+                            <div class="color-preset" style="background: #8b4513;" onclick="setColor('#8b4513')"></div>
+                            <div class="color-preset" style="background: #e8b4b8;" onclick="setColor('#e8b4b8')"></div>
+                            <div class="color-preset" style="background: #a67c9e;" onclick="setColor('#a67c9e')"></div>
+                            <div class="color-preset" style="background: #f4d9d9;" onclick="setColor('#f4d9d9')"></div>
+                            <div class="color-preset" style="background: #6b5b4e;" onclick="setColor('#6b5b4e')"></div>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="bgColor">צבע הרקע</label>
+                        <input type="color" id="bgColor" value="#fef5e7">
+                        <div class="color-presets">
+                            <div class="color-preset" style="background: #fef5e7;" onclick="setBgColor('#fef5e7')"></div>
+                            <div class="color-preset" style="background: #fde4e4;" onclick="setBgColor('#fde4e4')"></div>
+                            <div class="color-preset" style="background: #f0e6ff;" onclick="setBgColor('#f0e6ff')"></div>
+                            <div class="color-preset" style="background: #ffe8e8;" onclick="setBgColor('#ffe8e8')"></div>
+                            <div class="color-preset" style="background: #e8f3f0;" onclick="setBgColor('#e8f3f0')"></div>
+                            <div class="color-preset" style="background: #fff5f0;" onclick="setBgColor('#fff5f0')"></div>
+                            <div class="color-preset" style="background: #f5eef5;" onclick="setBgColor('#f5eef5')"></div>
+                            <div class="color-preset" style="background: #faf7f0;" onclick="setBgColor('#faf7f0')"></div>
+                            <div class="color-preset" style="background: #ede4f0;" onclick="setBgColor('#ede4f0')"></div>
+                            <div class="color-preset" style="background: #fffaed;" onclick="setBgColor('#fffaed')"></div>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="textOpacity">שקיפות הטקסט</label>
+                        <div class="range-display">
+                            <input type="range" id="textOpacity" min="0.3" max="1" step="0.1" value="1">
+                            <span id="opacityValue">100%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: רקע -->
+                <div id="background" class="tab-content">
+                    <div class="control-group">
+                        <label for="bgImage">העלה רקע משלך</label>
+                        <input type="file" id="bgImage" accept="image/*">
+                        <div id="bgPreview" class="uploaded-bg-preview"></div>
+                    </div>
+
+                    <div class="control-group">
+                        <label>או בחר דקוקציה</label>
+                        <select id="bgPattern" onchange="updatePreview()">
+                            <option value="">ללא דקוקציה</option>
+                            <option value="roses">ורדים ורודים</option>
+                            <option value="lavender">אריסה סגולה</option>
+                            <option value="cherry">פרחי דובדבן</option>
+                            <option value="geometric">עיצוב גיאומטרי</option>
+                            <option value="gradient">גרדיאנט עדין</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="bgOpacity">שקיפות הרקע</label>
+                        <div class="range-display">
+                            <input type="range" id="bgOpacity" min="0" max="1" step="0.1" value="1">
+                            <span id="bgOpacityValue">100%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: אלמנטים -->
+                <div id="elements" class="tab-content">
+                    <div class="control-group">
+                        <label>בחר אלמנטים דקורטיביים</label>
+                        <div class="element-grid">
+                            <button class="element-button" onclick="toggleElement('🌸', this)">🌸 פרח</button>
+                            <button class="element-button" onclick="toggleElement('🌹', this)">🌹 ורד</button>
+                            <button class="element-button" onclick="toggleElement('🌺', this)">🌺 פרח 2</button>
+                            <button class="element-button" onclick="toggleElement('🌻', this)">🌻 חמנייה</button>
+                            <button class="element-button" onclick="toggleElement('✨', this)">✨ ניצוצות</button>
+                            <button class="element-button" onclick="toggleElement('💫', this)">💫 כוכבים</button>
+                            <button class="element-button" onclick="toggleElement('🍃', this)">🍃 עלים</button>
+                            <button class="element-button" onclick="toggleElement('🦋', this)">🦋 פרפר</button>
+                            <button class="element-button" onclick="toggleElement('⭐', this)">⭐ כוכב</button>
+                            <button class="element-button" onclick="toggleElement('💚', this)">💚 לב</button>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="elementOpacity">שקיפות האלמנטים</label>
+                        <div class="range-display">
+                            <input type="range" id="elementOpacity" min="0.1" max="1" step="0.1" value="0.3">
+                            <span id="elementOpacityValue">30%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- כפתורים -->
+                <div class="button-group">
+                    <button onclick="downloadImage()">💾 הורד</button>
+                    <button class="reset" onclick="resetForm()">🔄 אפס</button>
+                </div>
+
+                <div class="export-hint">
+                    💡 לחץ "הורד" כדי לשמור כתמונה
+                </div>
+            </div>
+
+            <div class="preview-panel">
+                <div class="poem-canvas" id="poemCanvas">
+                    <div class="poem-text" id="poemDisplay"></div>
+                    <div id="elementContainer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentFont = 'inherit';
+        let selectedElements = [];
+        let uploadedImageData = null;
+
+        const poemText = document.getElementById('poemText');
+        const fontSize = document.getElementById('fontSize');
+        const textColor = document.getElementById('textColor');
+        const bgColor = document.getElementById('bgColor');
+        const bgImage = document.getElementById('bgImage');
+        const bgPattern = document.getElementById('bgPattern');
+        const poemDisplay = document.getElementById('poemDisplay');
+        const poemCanvas = document.getElementById('poemCanvas');
+        const elementContainer = document.getElementById('elementContainer');
+        const fontSizeValue = document.getElementById('fontSizeValue');
+        const textOpacity = document.getElementById('textOpacity');
+        const bgOpacity = document.getElementById('bgOpacity');
+        const elementOpacity = document.getElementById('elementOpacity');
+        const bgPreview = document.getElementById('bgPreview');
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function setFont(font, element) {
+            currentFont = font;
+            document.querySelectorAll('.font-option').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+            updatePreview();
+        }
+
+        function setColor(color) {
+            textColor.value = color;
+            updatePreview();
+        }
+
+        function setBgColor(color) {
+            bgColor.value = color;
+            updatePreview();
+        }
+
+        function toggleElement(element, button) {
+            if (selectedElements.includes(element)) {
+                selectedElements = selectedElements.filter(e => e !== element);
+                button.classList.remove('active');
+            } else {
+                selectedElements.push(element);
+                button.classList.add('active');
+            }
+            updatePreview();
+        }
+
+        bgImage.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    uploadedImageData = event.target.result;
+                    bgPreview.style.backgroundImage = `url(${uploadedImageData})`;
+                    updatePreview();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function updatePreview() {
+            poemDisplay.textContent = poemText.value;
+            poemDisplay.style.color = textColor.value;
+            poemDisplay.style.fontSize = fontSize.value + 'px';
+            poemDisplay.style.fontFamily = currentFont;
+            poemDisplay.style.opacity = textOpacity.value;
+
+            if (uploadedImageData) {
+                poemCanvas.style.backgroundImage = `url(${uploadedImageData})`;
+            } else {
+                const pattern = bgPattern.value;
+                if (pattern === 'roses') {
+                    poemCanvas.style.backgroundImage = 'radial-gradient(circle at 10% 20%, rgba(200, 100, 150, 0.2) 0%, transparent 50%), radial-gradient(circle at 90% 80%, rgba(200, 100, 150, 0.15) 0%, transparent 50%)';
+                } else if (pattern === 'lavender') {
+                    poemCanvas.style.backgroundImage = 'repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(180, 150, 200, 0.1) 35px, rgba(180, 150, 200, 0.1) 70px)';
+                } else if (pattern === 'cherry') {
+                    poemCanvas.style.backgroundImage = 'radial-gradient(circle at 20% 30%, rgba(255, 180, 200, 0.2) 0%, transparent 40%), radial-gradient(circle at 80% 70%, rgba(255, 180, 200, 0.15) 0%, transparent 40%)';
+                } else if (pattern === 'geometric') {
+                    poemCanvas.style.backgroundImage = 'linear-gradient(45deg, rgba(200, 162, 224, 0.05) 25%, transparent 25%), linear-gradient(-45deg, rgba(200, 162, 224, 0.05) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, rgba(200, 162, 224, 0.05) 75%), linear-gradient(-45deg, transparent 75%, rgba(200, 162, 224, 0.05) 75%)';
+                    poemCanvas.style.backgroundSize = '40px 40px';
+                } else if (pattern === 'gradient') {
+                    poemCanvas.style.backgroundImage = 'linear-gradient(135deg, rgba(254, 245, 231, 0.8), rgba(253, 228, 228, 0.8), rgba(240, 230, 255, 0.8))';
+                } else {
+                    poemCanvas.style.backgroundImage = 'none';
+                }
+            }
+
+            poemCanvas.style.backgroundColor = bgColor.value;
+            poemCanvas.style.opacity = bgOpacity.value;
+
+            // Elements
+            elementContainer.innerHTML = '';
+            const elementsToPlace = [
+                { element: '🌸', positions: ['10% 15%', '85% 85%', '15% 80%'] },
+                { element: '🌹', positions: ['5% 50%', '90% 20%'] },
+                { element: '🌺', positions: ['80% 60%', '20% 40%'] },
+                { element: '🌻', positions: ['15% 30%', '75% 75%'] },
+                { element: '✨', positions: ['25% 25%', '70% 50%', '30% 70%'] },
+                { element: '💫', positions: ['50% 20%', '40% 80%', '80% 40%'] },
+                { element: '🍃', positions: ['10% 70%', '85% 30%'] },
+                { element: '🦋', positions: ['20% 60%', '75% 45%'] },
+                { element: '⭐', positions: ['35% 35%', '65% 65%'] },
+                { element: '💚', positions: ['50% 50%'] }
+            ];
+
+            selectedElements.forEach(selectedEl => {
+                const elementData = elementsToPlace.find(e => e.element === selectedEl);
+                if (elementData) {
+                    elementData.positions.forEach(pos => {
+                        const div = document.createElement('div');
+                        div.className = 'canvas-element';
+                        div.textContent = selectedEl;
+                        div.style.left = pos.split(' ')[0];
+                        div.style.top = pos.split(' ')[1];
+                        div.style.opacity = elementOpacity.value;
+                        elementContainer.appendChild(div);
+                    });
+                }
+            });
+        }
+
+        poemText.addEventListener('input', updatePreview);
+        fontSize.addEventListener('input', function() {
+            fontSizeValue.textContent = this.value + 'px';
+            updatePreview();
+        });
+        textColor.addEventListener('input', updatePreview);
+        bgColor.addEventListener('input', updatePreview);
+        textOpacity.addEventListener('input', function() {
+            document.getElementById('opacityValue').textContent = Math.round(this.value * 100) + '%';
+            updatePreview();
+        });
+        bgOpacity.addEventListener('input', function() {
+            document.getElementById('bgOpacityValue').textContent = Math.round(this.value * 100) + '%';
+            updatePreview();
+        });
+        elementOpacity.addEventListener('input', function() {
+            document.getElementById('elementOpacityValue').textContent = Math.round(this.value * 10) * 10 + '%';
+            updatePreview();
+        });
+
+        function resetForm() {
+            poemText.value = '';
+            fontSize.value = 24;
+            fontSizeValue.textContent = '24px';
+            textColor.value = '#5a4a6b';
+            bgColor.value = '#fef5e7';
+            bgPattern.value = '';
+            bgImage.value = '';
+            bgPreview.style.backgroundImage = 'none';
+            uploadedImageData = null;
+            textOpacity.value = 1;
+            bgOpacity.value = 1;
+            elementOpacity.value = 0.3;
+            selectedElements = [];
+            currentFont = 'inherit';
+            document.querySelectorAll('.element-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.font-option').forEach((btn, idx) => {
+                btn.classList.remove('active');
+                if (idx === 0) btn.classList.add('active');
+            });
+            updatePreview();
+        }
+
+        function downloadImage() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = 600;
+            canvas.height = 800;
+
+            if (uploadedImageData) {
+                const img = new Image();
+                img.onload = function() {
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    drawTextAndElements(ctx, canvas.width, canvas.height);
+                };
+                img.src = uploadedImageData;
+            } else {
+                ctx.fillStyle = bgColor.value;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                const pattern = bgPattern.value;
+                if (pattern === 'roses') {
+                    ctx.fillStyle = 'rgba(200, 100, 150, 0.2)';
+                    ctx.beginPath();
+                    ctx.arc(60, 160, 100, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(540, 640, 120, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                drawTextAndElements(ctx, canvas.width, canvas.height);
+            }
+
+            function drawTextAndElements(ctx, w, h) {
+                ctx.globalAlpha = textOpacity.value;
+                ctx.fillStyle = textColor.value;
+                
+                let fontFamily = 'Arial';
+                if (currentFont === 'Almarai, sans-serif') fontFamily = 'Arial';
+                else if (currentFont === 'Amiri, serif') fontFamily = 'Georgia';
+                else if (currentFont === 'Cairo, sans-serif') fontFamily = 'Arial';
+                
+                ctx.font = 'bold ' + fontSize.value + 'px ' + fontFamily;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                const lines = poemText.value.split('\n');
+                const lineHeight = parseInt(fontSize.value) * 1.8;
+                const startY = (h - (lines.length - 1) * lineHeight) / 2;
+
+                lines.forEach((line, index) => {
+                    ctx.fillText(line, w / 2, startY + index * lineHeight);
+                });
+
+                ctx.globalAlpha = elementOpacity.value;
+                ctx.font = (Math.round(elementOpacity.value * 48)) + 'px Arial';
+                
+                const elementsToPlace = [
+                    { element: '🌸', positions: [[60, 120], [540, 680], [90, 640]] },
+                    { element: '🌹', positions: [[30, 400], [540, 160]] },
+                    { element: '🌺', positions: [[480, 480], [120, 320]] },
+                    { element: '🌻', positions: [[90, 240], [450, 600]] },
+                    { element: '✨', positions: [[150, 200], [420, 400], [180, 560]] },
+                    { element: '💫', positions: [[300, 160], [240, 640], [480, 320]] },
+                    { element: '🍃', positions: [[60, 560], [510, 240]] },
+                    { element: '🦋', positions: [[120, 480], [450, 360]] },
+                    { element: '⭐', positions: [[210, 280], [390, 520]] },
+                    { element: '💚', positions: [[300, 400]] }
+                ];
+
+                selectedElements.forEach(selectedEl => {
+                    const elementData = elementsToPlace.find(e => e.element === selectedEl);
+                    if (elementData) {
+                        elementData.positions.forEach(pos => {
+                            ctx.fillText(selectedEl, pos[0], pos[1]);
+                        });
+                    }
+                });
+
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL('image/png');
+                link.download = 'my_poem_design.png';
+                link.click();
+            }
+        }
+
+        // Initialize
+        updatePreview();
+    </script>
+</body>
+</html>
